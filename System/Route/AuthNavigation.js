@@ -22,6 +22,7 @@ import Contact from "../View/Contact";
 import TermsAndConditions from "../View/TermsAndConditions";
 import Faq from "../View/Faq/Faq";
 import Notifications from "../View/Notifications";
+import OrderDetails from "../View/Orders/OrderDetails";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -96,7 +97,7 @@ const BottomStack = () => {
           tabBarLabel: 'Home',
 
           tabBarIcon:({color , size}) => (
-            <FontAwesome5 name={'bus'} size={iconsSize} color={color} />
+            <FontAwesome5 name={'truck'} size={iconsSize} color={color} />
           ),
 
         }}
@@ -168,6 +169,16 @@ const HomeScreenStack = ({navigation}) => {
 
         options={({route}) => ({
           title: 'Notifications',
+        })}
+
+
+      />
+      <Stack.Screen
+        name="OrderDetails"
+        component={OrderDetails}
+
+        options={({route}) => ({
+          title: 'Order Details',
         })}
 
 

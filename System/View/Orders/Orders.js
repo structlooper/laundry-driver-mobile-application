@@ -3,8 +3,10 @@ import { View, Text,StyleSheet,Image,TouchableOpacity,ScrollView} from "react-na
 import { mainColor, MyButton } from "../../Utility/MyLib";
 
 
-const OrderCard = () => {
+const OrderCard = (navi) => {
   return (
+    <TouchableOpacity onPress={()=>{navi.navigate('HomeScreenStack',{screen:'OrderDetails'})}}>
+
     <View style={styles.OrderCardContainer}>
       <View style={styles.OrderCardContainerRows}>
         <View style={styles.Rows}>
@@ -24,7 +26,7 @@ const OrderCard = () => {
           </View>
         </View>
         <View style={[styles.Rows,{marginLeft:20,marginTop:5}]}>
-          <TouchableOpacity style={styles.OrderStatusButton}>
+          <TouchableOpacity style={styles.OrderStatusButton} onPress={() => {console.log('inner')}}>
             <Text style={styles.OrderStatusButtonText}>
               Mark Delivery
             </Text>
@@ -42,21 +44,23 @@ const OrderCard = () => {
       </View>
 
     </View>
+    </TouchableOpacity>
+
 
   )
 }
 
-const Orders = () => {
+const Orders = ({navigation}) => {
   return (
     <View style={styles.mainContainer}>
       <ScrollView>
-        {OrderCard()}
-        {OrderCard()}
-        {OrderCard()}
-        {OrderCard()}
-        {OrderCard()}
-        {OrderCard()}
-        {OrderCard()}
+        {OrderCard(navigation)}
+        {OrderCard(navigation)}
+        {OrderCard(navigation)}
+        {OrderCard(navigation)}
+        {OrderCard(navigation)}
+        {OrderCard(navigation)}
+        {OrderCard(navigation)}
       </ScrollView>
 
     </View>
