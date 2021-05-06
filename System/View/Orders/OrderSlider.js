@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Orders from "./Orders";
+import CompletedOrders from "./CompletedOrders";
 import { mainColor } from "../../Utility/MyLib";
 
 
@@ -20,7 +21,7 @@ export default function OrderSlider() {
       }}
     >
       <Tab.Screen name="Assigned" component={Orders}  />
-      <Tab.Screen name="Completed" component={Orders} />
+      <Tab.Screen name="Completed" component={CompletedOrders} />
     </Tab.Navigator>
   );
 }

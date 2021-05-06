@@ -49,17 +49,63 @@ const OrderCard = (navi) => {
 
   )
 }
+const OrderCardPickup = (navi) => {
+  return (
+    <TouchableOpacity onPress={()=>{navi.navigate('HomeScreenStack',{screen:'OrderDetails'})}}>
+
+    <View style={styles.OrderCardContainer}>
+      <View style={styles.OrderCardContainerRows}>
+        <View style={styles.Rows}>
+          <View style={styles.OrderPlaceHolderImageContainer}>
+            <Image source={require('../../Public/Images/machine.jpg')} style={styles.OrderPlaceHolderImage} />
+          </View>
+        </View>
+        <View style={styles.Rows}>
+          <Text style={styles.OrderStatusHeader}>
+            Ready  to  Pickup
+          </Text>
+          <Text style={styles.OrderTextStyle}>Order No:22145052</Text>
+          <View style={styles.DateAndTimeContainer}>
+            <Text style={styles.LabelText}>Delivery time</Text>
+            <Text>21 June 2020</Text>
+            <Text>01:00 pm</Text>
+          </View>
+        </View>
+        <View style={[styles.Rows,{marginLeft:20,marginTop:5}]}>
+          <TouchableOpacity style={styles.OrderStatusButton} onPress={() => {console.log('inner')}}>
+            <Text style={styles.OrderStatusButtonText}>
+              Mark  Picked
+            </Text>
+          </TouchableOpacity>
+          <View style={[styles.DateAndTimeContainer,{marginTop:22,}]}>
+            <Text style={styles.LabelText}>Delivery time</Text>
+            <Text>$ 78.00</Text>
+            <Text>Cash on Delivery</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.AddressDetailsContainer}>
+        <Text style={styles.AddressDetailsLabel}>Address</Text>
+        <Text style={{ overflow:'hidden',height:21, width:270, }}>B11 Old Fort Street, Workshop Tower ...</Text>
+      </View>
+
+    </View>
+    </TouchableOpacity>
+
+
+  )
+}
 
 const Orders = ({navigation}) => {
   return (
     <View style={styles.mainContainer}>
       <ScrollView>
         {OrderCard(navigation)}
+        {OrderCardPickup(navigation)}
         {OrderCard(navigation)}
+        {OrderCardPickup(navigation)}
         {OrderCard(navigation)}
-        {OrderCard(navigation)}
-        {OrderCard(navigation)}
-        {OrderCard(navigation)}
+        {OrderCardPickup(navigation)}
         {OrderCard(navigation)}
       </ScrollView>
 

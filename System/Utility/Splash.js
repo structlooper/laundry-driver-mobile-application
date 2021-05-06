@@ -32,4 +32,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Splash();
+export default Splash;

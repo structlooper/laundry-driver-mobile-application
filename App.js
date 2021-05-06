@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, View,Text } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import Splash from "./System/Utility/Splash";
-import GuestNavigation from "./System/Route/GuestNavigation";
-import {NavigationContainer} from "@react-navigation/native";
-import AuthNavigation from "./System/Route/AuthNavigation";
+import CheckStack from "./CheckStack";
 export default class App extends Component
 {
   constructor(){
@@ -29,16 +27,12 @@ export default class App extends Component
     if (this.state.isVisible === true){
       return (
         <View style={ styles.MainContainer }>
-          {Splash}
+          <Splash/>
         </View>
       )
     }else{
       return (
-        <NavigationContainer>
-          <GuestNavigation />
-          {/*<AuthNavigation/>*/}
-        </NavigationContainer>
-
+        <CheckStack />
       )
     }
   }

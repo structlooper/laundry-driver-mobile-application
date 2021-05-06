@@ -13,23 +13,38 @@ import {
   DrawerItemList,
 } from '@react-navigation/drawer';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { mainColor } from "../Utility/MyLib";
+import { mainColor,ImageUrl,UserImagePlaceHolder } from "../Utility/MyLib";
+import { CheckContext } from "../Utility/CheckContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const getUserDetails = async () => {
+  return await AsyncStorage.getItem('userDetails')
+}
 const CustomSidebarMenu = (props) => {
+  const [userDetails,SetUserDetails] = React.useState("{}")
+  React.useEffect(()=>{
+    getUserDetails().then(details => {
+      SetUserDetails(details);
+    })
+  },[])
+  let dataConverted = JSON.parse(userDetails)
+  const {logOut} = React.useContext(CheckContext)
+  let dp = (dataConverted.profile_picture !== null) ? {uri:ImageUrl+dataConverted.profile_picture} : UserImagePlaceHolder
+
   return (
     <SafeAreaView style={{flex: 1, }}>
       {/*Top Large Image */}
       <View style={{ backgroundColor:mainColor,paddingVertical:15,paddingHorizontal:10,flexDirection:'row'}}>
         <Image
-          source={logo}
+          source={dp}
           style={styles.sideMenuProfileIcon}
         />
         <View style={{ justifyContent:'center',marginHorizontal:5}}>
           <Text style={{color:'#fff'}}>
-            Driver Kumar
+            {dataConverted.delivery_boy_name}
           </Text>
-          <Text  style={{color:'#fff'}}>
-            Delhi , India
+          <Text  style={{color:'#fff',width:150,fontSize:12}}>
+            {dataConverted.phone_number}
           </Text>
         </View>
       </View>
@@ -46,8 +61,10 @@ const CustomSidebarMenu = (props) => {
       }}>
         <TouchableOpacity
           {...props}
-          onPress={() => {
-            props.navigation.navigate('Login')
+          onPress={ async () => {
+            await AsyncStorage.removeItem('userDetails');
+            const logout = () => {logOut()}
+            logout()
           }}
         >
 
