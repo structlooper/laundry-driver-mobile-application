@@ -7,6 +7,7 @@ import NoData from "../../Utility/NoData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
 import Geolocation from 'react-native-geolocation-service';
+import OrderStatusChangeController from "../../Controller/OrderStatusChangeController";
 
 const OrderDetails = ({route}) => {
   const [activeSlide, onChangeActiveSlide] = React.useState(1);
@@ -103,20 +104,40 @@ const OrderDetails = ({route}) => {
       if (orderDetails.status === 2){
         return (
           <View style={{flexDirection:'row'}}>
-            <TouchableOpacity style={Style.OrderStatusButton} onPress={() => {console.log('inner')}}>
+            <TouchableOpacity style={Style.OrderStatusButton} onPress={() => {
+              OrderStatusChangeController(3,orderId).then(result => {
+                MyToast(result.message)
+                getOrderDetails().then()
+              })
+            }}>
               <FontAwesome5 name={'check'} size={20} color={'white'} style={{textAlign:'center'}}/>
             </TouchableOpacity>
-            <TouchableOpacity style={[Style.OrderStatusButton,{backgroundColor:'red'}]} onPress={() => {console.log('inner')}}>
+            <TouchableOpacity style={[Style.OrderStatusButton,{backgroundColor:'red'}]} onPress={() => {
+              OrderStatusChangeController(0,orderId).then(result => {
+                MyToast(result.message)
+                getOrderDetails().then()
+              })
+            }}>
               <FontAwesome5 name={'times'} size={20} color={'white'} style={{textAlign:'center'}} />
             </TouchableOpacity>
           </View>
         )
       }else if(orderDetails.status < 4){
-        return MyButton(() => {console.log('marked as delivery')},'Mark Picked','','truck-check')
+        return MyButton(() => {
+          OrderStatusChangeController(4,orderId).then(result => {
+            MyToast(result.message)
+            getOrderDetails().then()
+          })
+        },'Mark Picked','','truck-check')
       }else if (orderDetails.status === 7){
         return MyOutlineButton(() => {console.log('Delivered')},'Delivered',{borderWidth:1,borderColor:mainColor},'check')
       }else{
-        return  MyButton(() => {console.log('marked as delivery')},'Mark Delivered','','truck-check')
+        return  MyButton(() => {
+          OrderStatusChangeController(7,orderId).then(result => {
+            MyToast(result.message)
+            getOrderDetails().then()
+          })
+        },'Mark Delivered','','truck-check')
       }
     }
     const product = (data,i) => {

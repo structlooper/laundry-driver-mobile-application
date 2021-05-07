@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
 import { View, Text,StyleSheet,Image,TouchableOpacity,ScrollView} from "react-native";
-import { fetchAuthPostFunction, mainColor, MyButton,ImageUrl } from "../../Utility/MyLib";
+import { fetchAuthPostFunction, mainColor, MyButton, ImageUrl, MyToast } from "../../Utility/MyLib";
 import Loader from "../../Utility/Loader";
 import NoData from "../../Utility/NoData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import moment from "moment";
+import OrderStatusChangeController from "../../Controller/OrderStatusChangeController";
 
 
 const Orders = ({navigation}) => {
@@ -28,10 +29,20 @@ const Orders = ({navigation}) => {
       if (order.status === 2){
         return (
           <View style={{flexDirection:'row'}}>
-            <TouchableOpacity style={styles.OrderStatusButton} onPress={() => {console.log('inner')}}>
+            <TouchableOpacity style={styles.OrderStatusButton} onPress={() => {OrderStatusChangeController(3,order.id).then(result => {
+              MyToast(result.message)
+              getOrders().then()
+            })
+            }}>
               <FontAwesome5 name={'check'} size={18} color={'white'} />
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.OrderStatusButton,{backgroundColor:'red',marginLeft:2}]} onPress={() => {console.log('inner')}}>
+            <TouchableOpacity style={[styles.OrderStatusButton,{backgroundColor:'red',marginLeft:2}]} onPress={() => {
+              OrderStatusChangeController(0,order.id).then(result => {
+                MyToast(result.message)
+                getOrders().then()
+              })
+
+            }}>
               <FontAwesome5 name={'times'} size={18} color={'white'} style={{width:25,textAlign:'center'}} />
             </TouchableOpacity>
           </View>
@@ -40,14 +51,26 @@ const Orders = ({navigation}) => {
       }
       if (order.status < 4){
         return (
-          <TouchableOpacity style={styles.OrderStatusButton} onPress={() => {console.log('inner')}}>
+          <TouchableOpacity style={styles.OrderStatusButton} onPress={() => {
+            OrderStatusChangeController(4,order.id).then(result => {
+              MyToast(result.message)
+              getOrders().then()
+            })
+
+          }}>
             <Text style={styles.OrderStatusButtonText}>
               Mark Pickup
             </Text>
           </TouchableOpacity>
         )
       }return (
-        <TouchableOpacity style={[styles.OrderStatusButton,{backgroundColor:'green'}]} onPress={() => {console.log('inner')}}>
+        <TouchableOpacity style={[styles.OrderStatusButton,{backgroundColor:'green'}]} onPress={() => {
+          OrderStatusChangeController(7,order.id).then(result => {
+            MyToast(result.message)
+            getOrders().then()
+          })
+
+        }}>
           <Text style={[styles.OrderStatusButtonText]}>
             Mark Delivery
           </Text>
