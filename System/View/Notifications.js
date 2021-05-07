@@ -1,67 +1,92 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import {View,Text,StyleSheet,Image,ScrollView,TouchableOpacity} from 'react-native';
-import {mainColor} from "../Utility/MyLib";
+import { fetchAuthPostFunction, mainColor ,ImageUrl} from "../Utility/MyLib";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Loader from "../Utility/Loader";
+import NoData from "../Utility/NoData";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "@react-navigation/native";
+const Notifications = ({navigation}) => {
+  const isFocused = useIsFocused();
+  const [textShown, setTextShown] = React.useState(false);
+  const [lengthMore,setLengthMore] = React.useState(false);
+  const [notifications , setNotifications] = React.useState(null)
+  useEffect(() => {
+    getNotifications().then()
+  },[isFocused])
 
-const orderCard = (nav) => {
-  const [textShown, setTextShown] = React.useState(false); //To show ur remaining Text
-  const [lengthMore,setLengthMore] = React.useState(false); //to show the "Read more & Less Line"
-  const toggleNumberOfLines = () => { //To toggle the show text or hide it
+  const toggleNumberOfLines = () => {
     setTextShown(!textShown);
   }
-
   const onTextLayout = useCallback(e =>{
     setLengthMore(e.nativeEvent.lines.length >=4); //to check the text is more than 4 lines or not
     // console.log(e.nativeEvent);
   },[]);
-  return (
-    <View style={styles.orderCart}>
-      <View style={styles.statusImageContainer}>
-        <Image source={require('../Public/Images/machine.jpg')} style={styles.statusImage}/>
+
+
+
+  const getNotifications = async () => {
+    let driverDetails = JSON.parse(await AsyncStorage.getItem('userDetails'));
+    let driverId = driverDetails.id;
+
+    fetchAuthPostFunction('delivery_partner/notifications',{driver_id:driverId}).then(response => {
+      setNotifications(response)
+    })
+  }
+  const orderCard = (notification,i) => {
+
+    return (
+      <View style={styles.orderCart} key={i}>
+        <View style={styles.statusImageContainer}>
+          <Image source={{ uri:ImageUrl+notification.status_image}} style={styles.statusImage}/>
+        </View>
+        <View style={styles.orderLabelContainer}>
+          <Text style={styles.orderLabelHeader}>
+            {notification.title}
+          </Text>
+
+          <Text
+            onTextLayout={onTextLayout}
+            numberOfLines={textShown ? undefined : 2}
+            style={{ lineHeight: 16 ,color:'#000' }}>
+            ({notification.order_id})
+          </Text>
+          <Text>
+            {notification.desc}
+          </Text>
+          {
+            lengthMore ? <Text
+                onPress={toggleNumberOfLines}
+                style={{ lineHeight: 16, marginTop: 10 }}>{textShown ? 'Read less...' : 'Read more...'}</Text>
+              :null
+          }
+        </View>
+        <View style={styles.priceContainer}>
+          <FontAwesome5 name={'clock'} size={15} color={'black'}  />
+
+          <Text style={{fontSize:10,color:'black'}}>
+            {notification.created_at}
+          </Text>
+
+        </View>
       </View>
-      <View style={styles.orderLabelContainer}>
-        <Text style={styles.orderLabelHeader}>
-          Order Confirmed
-        </Text>
 
-        <Text
-          onTextLayout={onTextLayout}
-          numberOfLines={textShown ? undefined : 2}
-          style={{ lineHeight: 16 ,color:'#000' }}>
-          It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
-        </Text>
-
-        {
-          lengthMore ? <Text
-              onPress={toggleNumberOfLines}
-              style={{ lineHeight: 16, marginTop: 10 }}>{textShown ? 'Read less...' : 'Read more...'}</Text>
-            :null
-        }
-      </View>
-      <View style={styles.priceContainer}>
-        <FontAwesome5 name={'clock'} size={15} color={'black'}  />
-
-        <Text style={{fontSize:10,color:'black'}}>
-          12:05
-        </Text>
-
-      </View>
-    </View>
-
-  )
-}
-
-const Notifications = ({navigation}) => {
+    )
+  }
+  if (notifications === null){
+    return <Loader />
+  }else if(notifications.status === 0){
+    return NoData('notifications')
+  }
   return (
     <View style={styles.mainContainer}>
       <ScrollView>
-        {orderCard(navigation)}
-        {orderCard(navigation)}
-        {orderCard(navigation)}
-        {orderCard(navigation)}
-        {orderCard(navigation)}
-        {orderCard(navigation)}
-        {orderCard(navigation)}
+        {
+          (notifications.data).map((data,i) => {
+            return orderCard(data,i)
+          })
+        }
+
       </ScrollView>
     </View>
   )
@@ -83,14 +108,10 @@ const styles = StyleSheet.create({
   },
   statusImageContainer:{
     height:65,
-    borderWidth:3,
-    borderRadius: 100/2,
-    padding:5,
-    borderColor:'grey'
   },
   statusImage:{
-    width:50,
-    height:50,
+    width:70,
+    height:70,
     borderRadius: 50/ 2
   },
   orderLabelContainer : {
@@ -101,6 +122,7 @@ const styles = StyleSheet.create({
   orderLabelHeader:{
     fontSize:18,
     fontWeight:'bold',
+    color: mainColor
   },
   orderStatusLabel:{
     height:30,

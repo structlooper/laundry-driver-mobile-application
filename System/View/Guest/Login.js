@@ -8,7 +8,6 @@ const submitLoginFrom = async (number,navi,onLoginLoading) => {
   let dom = {};
   dom.phone_number = number;
   dom.fcm_token = await AsyncStorage.getItem('fcmToken');
-  console.log('login_data',dom)
   let result = await fetchPostFunction('delivery_partner/login',dom);
   onLoginLoading(false)
   if (result.status == 0) {
