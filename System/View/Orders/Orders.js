@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { View, Text,StyleSheet,Image,TouchableOpacity,ScrollView} from "react-native";
-import { fetchAuthPostFunction, mainColor, MyButton, ImageUrl, MyToast } from "../../Utility/MyLib";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, RefreshControl } from "react-native";
+import { fetchAuthPostFunction, mainColor, MyButton, ImageUrl, MyToast, wait } from "../../Utility/MyLib";
 import Loader from "../../Utility/Loader";
 import NoData from "../../Utility/NoData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -10,14 +10,20 @@ import moment from "moment";
 import OrderStatusChangeController from "../../Controller/OrderStatusChangeController";
 
 
+
 const Orders = ({navigation}) => {
   const focus = useIsFocused();
   const [orders,setOrders] = React.useState(null);
+  const [refreshing, setRefreshing] = React.useState(false);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
 
   useEffect(() => {
     getOrders().then()
-  },[focus])
+  },[focus,refreshing])
   const getOrders = async () => {
     let driverDetails = JSON.parse(await AsyncStorage.getItem('userDetails'))
     fetchAuthPostFunction('delivery_partner/orders',{driver_id:driverDetails.id}).then(response => {
@@ -63,6 +69,20 @@ const Orders = ({navigation}) => {
             </Text>
           </TouchableOpacity>
         )
+      }else if(order.status === 5){
+        return (
+          <TouchableOpacity style={styles.OrderStatusButton} onPress={() => {
+            OrderStatusChangeController(6,order.id).then(result => {
+              MyToast(result.message)
+              getOrders().then()
+            })
+
+          }}>
+            <Text style={styles.OrderStatusButtonText}>
+              Out for Delivery
+            </Text>
+          </TouchableOpacity>
+        )
       }return (
         <TouchableOpacity style={[styles.OrderStatusButton,{backgroundColor:'green'}]} onPress={() => {
           OrderStatusChangeController(7,order.id).then(result => {
@@ -72,7 +92,7 @@ const Orders = ({navigation}) => {
 
         }}>
           <Text style={[styles.OrderStatusButtonText]}>
-            Mark Delivery
+            Mark Delivered
           </Text>
         </TouchableOpacity>
       )
@@ -88,7 +108,7 @@ const Orders = ({navigation}) => {
                 <Image source={{uri:ImageUrl+order.label_image}} style={styles.OrderPlaceHolderImage} />
               </View>
             </View>
-            <View style={styles.Rows}>
+            <View style={[styles.Rows,{flex:1}]}>
               <Text style={styles.OrderStatusHeader}>
                 {order.label_for_delivery_boy}
               </Text>
@@ -99,7 +119,7 @@ const Orders = ({navigation}) => {
                 <Text>  {(order.status < 4)? order.pickup_time : order.drop_time}</Text>
               </View>
             </View>
-            <View style={[styles.Rows,{marginLeft:20,marginTop:5}]}>
+            <View style={[styles.Rows,{marginTop:5}]}>
               {orderStatusBtn()}
               <View style={[styles.DateAndTimeContainer,{marginTop:22,}]}>
                 <Text style={styles.LabelText}>Total amount</Text>
@@ -127,7 +147,12 @@ const Orders = ({navigation}) => {
   }
   return (
     <View style={styles.mainContainer}>
-      <ScrollView>
+      <ScrollView refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }>
         {
           orders.map((data,i) => {
             return OrderCard(data,i)

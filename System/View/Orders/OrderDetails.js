@@ -1,38 +1,54 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView,Linking } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Linking,
+  RefreshControl,
+  SafeAreaView,
+} from "react-native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { fetchAuthPostFunction, mainColor, MyButton, MyOutlineButton, MyToast } from "../../Utility/MyLib";
+import { fetchAuthPostFunction, mainColor, MyButton, MyOutlineButton, MyToast ,wait} from "../../Utility/MyLib";
 import Loader from "../../Utility/Loader";
 import NoData from "../../Utility/NoData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-import Geolocation from 'react-native-geolocation-service';
+// import Geolocation from 'react-native-geolocation-service';
 import OrderStatusChangeController from "../../Controller/OrderStatusChangeController";
 
 const OrderDetails = ({route}) => {
   const [activeSlide, onChangeActiveSlide] = React.useState(1);
   const {orderId} = route.params
   const [orderDetails,setOrderDetails] = React.useState(null)
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
+
   const [location,setLocation] = React.useState({
     lat:null,
     lng:null
   })
   useEffect(() => {
-      Geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            lat:position.coords.latitude,
-            lng:position.coords.longitude
-          })
-        },
-        (error) => {
-          // See error code charts below.
-          console.log(error.code, error.message);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
+      // Geolocation.getCurrentPosition(
+      //   (position) => {
+      //     setLocation({
+      //       lat:position.coords.latitude,
+      //       lng:position.coords.longitude
+      //     })
+      //   },
+      //   (error) => {
+      //     // See error code charts below.
+      //     console.log(error.code, error.message);
+      //   },
+      //   { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      // );
     getOrderDetails().then()
-  },[])
+  },[refreshing])
   const getOrderDetails = async () => {
     let driverDetails = JSON.parse(await AsyncStorage.getItem('userDetails'))
     fetchAuthPostFunction('delivery_partner/orders/details',{driver_id:driverDetails.id,order_id:orderId}).then(response => {
@@ -129,7 +145,15 @@ const OrderDetails = ({route}) => {
             getOrderDetails().then()
           })
         },'Mark Picked','','truck-check')
-      }else if (orderDetails.status === 7){
+      }else if(orderDetails.status === 5){
+        return MyButton(() => {
+          OrderStatusChangeController(6,orderId).then(result => {
+            MyToast(result.message)
+            getOrderDetails().then()
+          })
+        },'Out for Delivery',{borderWidth:1,borderColor:mainColor},'check')
+
+      } else if (orderDetails.status === 7){
         return MyOutlineButton(() => {console.log('Delivered')},'Delivered',{borderWidth:1,borderColor:mainColor},'check')
       }else{
         return  MyButton(() => {
@@ -149,14 +173,14 @@ const OrderDetails = ({route}) => {
                 {data.qty}
               </Text>
             </View>
-            <View style={{flex:2}}>
+            <View style={{flex:2.5}}>
               <Text style={{ fontSize:15,color: 'black'}}>
                 {data.product_name}({data.service_name})
               </Text>
             </View>
             <View style={{flex:1}}>
               <Text style={{ fontSize:15,color: 'black',marginLeft:40}}>
-                {data.price}
+                ₹ {data.price}
               </Text>
             </View>
           </View>
@@ -166,22 +190,23 @@ const OrderDetails = ({route}) => {
 
     return (
       <View style={{paddingVertical: 20,paddingHorizontal:20, height:'85%'}}>
-        <ScrollView style={{}}>
+        <View>
           {(orderDetails.products).map((data,i) =>
               product(data,i)
             )}
-        </ScrollView>
+
+        </View>
         <View style={{flexDirection:'row',marginTop:20}}>
-          <Text style={{fontSize:18,color:'#000',flex:1,marginLeft:5}}>Subtotal</Text>
-          <Text style={{fontSize:18,color:'#000',marginRight:30}}>₹ {orderDetails.sub_total}</Text>
+          <Text style={Style.LabelTitle}>Subtotal</Text>
+          <Text style={Style.LabelPrice}>₹ {orderDetails.sub_total}</Text>
         </View>
         <View style={{flexDirection:'row'}}>
-          <Text style={{fontSize:18,color:'#000',flex:1,marginLeft:5}}>Discount</Text>
-          <Text style={{fontSize:18,color:'#000',marginRight:30}}>₹ {orderDetails.discount}</Text>
+          <Text style={Style.LabelTitle}>Discount</Text>
+          <Text style={Style.LabelPrice}>₹ {orderDetails.discount}</Text>
         </View>
         <View style={{flexDirection:'row'}}>
-          <Text style={{fontSize:18,color:'#000',flex:1,marginLeft:5}}>Total</Text>
-          <Text style={{fontSize:18,color:'#000',marginRight:30}}>₹ {orderDetails.total}</Text>
+          <Text style={Style.LabelTitle}>Total</Text>
+          <Text style={Style.LabelPrice}>₹ {orderDetails.total}</Text>
         </View>
         <View style={{marginTop:10}}>
           {orderBtn()}
@@ -191,7 +216,22 @@ const OrderDetails = ({route}) => {
     )
   }
   return (
-    <View style={Style.MainContainer}>
+
+    // <ScrollView  refreshControl={
+    //   <RefreshControl
+    //     refreshing={refreshing}
+    //     onRefresh={onRefresh}
+    //   />
+    // } style={{ height:'100%' }}>
+    <SafeAreaView style={Style.MainContainer}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }>
+
       <View style={Style.ChildContainer}>
         <View style={Style.RowsContainer}>
           <View style={Style.Row}>
@@ -199,7 +239,7 @@ const OrderDetails = ({route}) => {
               Ordered by
             </Text>
             <Text style={{fontSize:18}}>
-              {orderDetails.customer_id.customer_name}
+              {orderDetails.customer_id.customer_name} ({orderDetails.customer_id.phone_number})
             </Text>
           </View>
           <View style={{ marginRight:10,padding:5 }} >
@@ -241,16 +281,22 @@ const OrderDetails = ({route}) => {
           </TouchableOpacity>
 
         </View>
-        {(activeSlide === 1) ? OrderInfo() : ClothList()  }
+        <View>
+          {(activeSlide === 1) ? OrderInfo() : ClothList()  }
+        </View>
       </View>
+      </ScrollView>
 
-    </View>
-  );
+    </SafeAreaView>
+// {/*</ScrollView>*/}
+
+);
 };
 
 const Style = StyleSheet.create({
   MainContainer:{
     flex:1,
+
     backgroundColor:'#eee',
   },
   ChildContainer:{
@@ -287,5 +333,9 @@ const Style = StyleSheet.create({
   OrderStatusButtonText:{
     color:'#fff'
   },
+  LabelTitle:{
+    fontSize:18,color:'#000',flex:1,marginLeft:5
+  },
+  LabelPrice:{fontSize:18,color:'#000',marginRight:30},
 })
 export default OrderDetails;

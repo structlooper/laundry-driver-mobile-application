@@ -6,6 +6,7 @@ import {
   ToastAndroid,
   SafeAreaView,
   StyleSheet,
+  ScrollView
 } from 'react-native';
 import {
   MyButton,
@@ -45,6 +46,8 @@ const Register = ({navigation}) => {
     const [number, onChangeNumber] = React.useState(null);
     const [email, onChangeEmail] = React.useState(null);
     return (
+      <ScrollView>
+
       <View style={{flex: 1, backgroundColor: '#fff'}}>
         <View style={{alignItems: 'center', borderBottomWidth: 0.5, padding: 10}}>
           <Text style={{fontSize: 17}}>Register</Text>
@@ -71,7 +74,9 @@ const Register = ({navigation}) => {
               <Text style={{fontSize: 15}}>Add Photo</Text>
             </View>
           </View>
+
           <View style={{marginTop: 25}}>
+
             <SafeAreaView style={styles.signupForm}>
               {MyTextInput(
                 username,
@@ -114,10 +119,14 @@ const Register = ({navigation}) => {
                 </Text>
               </TouchableOpacity>
             </View>
+
           </View>
+
         </View>
       </View>
-    );
+</ScrollView>
+
+);
   };
 
 const styles = StyleSheet.create({

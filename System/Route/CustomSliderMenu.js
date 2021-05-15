@@ -26,7 +26,7 @@ const CustomSidebarMenu = (props) => {
     getUserDetails().then(details => {
       SetUserDetails(details);
     })
-  },[])
+  },)
   let dataConverted = JSON.parse(userDetails)
   const {logOut} = React.useContext(CheckContext)
   let dp = (dataConverted.profile_picture !== null) ? {uri:ImageUrl+dataConverted.profile_picture} : UserImagePlaceHolder
@@ -87,11 +87,9 @@ const CustomSidebarMenu = (props) => {
 
 const styles = StyleSheet.create({
   sideMenuProfileIcon: {
-    resizeMode: 'center',
     width: 80,
     height: 80,
     borderRadius: 500 / 2,
-    alignSelf: 'center',
 
   },
   iconStyle: {

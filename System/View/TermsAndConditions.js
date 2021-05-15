@@ -1,43 +1,55 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
 import { logo } from "../Utility/Images";
-import { AppName } from "../Utility/MyLib";
-
+import { AppName, capitalizeFirstLetter, fetchAuthPostFunction } from "../Utility/MyLib";
+import Loader from "../Utility/Loader";
+import NoData from "../Utility/NoData";
 const TermsAndConditions = () => {
+  const [policy , setPolicy] = React.useState(null)
+
+  useEffect(() => {
+    getPolicy().then()
+  },[])
+  const getPolicy = async () => {
+    fetchAuthPostFunction('privacy_policy',{lang:'en'}).then(response => {
+      setPolicy(response.result)
+    })
+  }
+  if (policy === null){
+    return <Loader />
+  }else if(policy.length === 0){
+    return NoData('Data');
+  }
+
+  const designCard = (data,i) =>{
+    return (
+      <View style={styles.childContainer} key={i}>
+        <Text style={{color:'gray',fontSize:18,marginVertical:10,borderBottomWidth:.2}}>{capitalizeFirstLetter(data.title)}</Text>
+        <View >
+          <Text style={styles.AppDescriptionText}>
+            {data.description}
+          </Text>
+
+        </View>
+      </View>
+    )
+  }
+
   return (
     <View style={styles.mainContainer}>
       <ScrollView>
 
-      <View style={styles.childContainer}>
-        <View style={styles.AppDetailsContainer}>
-          <Image source={logo} style={styles.AppImage} />
-          <Text style={styles.AppName}>{AppName}</Text>
-        </View>
-        </View>
-
         <View style={styles.childContainer}>
-            <Text style={{color:'gray',fontSize:18,marginVertical:10,borderBottomWidth:.2}}>Terms of use</Text>
-            <View >
-              <Text style={styles.AppDescriptionText}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-              </Text>
-              <Text style={styles.AppDescriptionText}>
-                veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.
-
-              </Text>
-            </View>
-         </View>
-        <View style={styles.childContainer}>
-            <Text style={{color:'gray',fontSize:18,marginVertical:10,borderBottomWidth:.2}}>Privacy Policy</Text>
-            <View >
-              <Text style={styles.AppDescriptionText}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-              </Text>
-
-            </View>
-         </View>
+          <View style={styles.AppDetailsContainer}>
+            <Image source={logo} style={styles.AppImage} />
+            <Text style={styles.AppName}>{AppName}</Text>
+          </View>
+        </View>
+        {
+          policy.map((data,i) => {
+            return designCard(data,i)
+          })
+        }
       </ScrollView>
 
     </View>

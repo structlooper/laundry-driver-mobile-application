@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { View, Text,StyleSheet,Image,TouchableOpacity,ScrollView} from "react-native";
-import { fetchAuthPostFunction, mainColor, MyButton,ImageUrl } from "../../Utility/MyLib";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, RefreshControl } from "react-native";
+import { fetchAuthPostFunction, mainColor, MyButton, ImageUrl, wait } from "../../Utility/MyLib";
 import Loader from "../../Utility/Loader";
 import NoData from "../../Utility/NoData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,11 +13,16 @@ import moment from "moment";
 const CompletedOrders = ({navigation}) => {
   const focus = useIsFocused();
   const [orders,setOrders] = React.useState(null);
+  const [refreshing, setRefreshing] = React.useState(false);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
 
   useEffect(() => {
     getOrders().then()
-  },[focus])
+  },[focus,refreshing])
   const getOrders = async () => {
     let driverDetails = JSON.parse(await AsyncStorage.getItem('userDetails'))
     fetchAuthPostFunction('delivery_partner/orders/completed',{driver_id:driverDetails.id}).then(response => {
@@ -36,7 +41,7 @@ const CompletedOrders = ({navigation}) => {
                 <Image source={{ uri:ImageUrl+order.label_image }} style={styles.OrderPlaceHolderImage} />
               </View>
             </View>
-            <View style={styles.Rows}>
+            <View style={[styles.Rows,{flex:1}]}>
               <Text style={styles.OrderStatusHeader}>
                 Completed
               </Text>
@@ -47,7 +52,7 @@ const CompletedOrders = ({navigation}) => {
                 <Text>  {(order.status < 4)? order.pickup_time : order.drop_time}</Text>
               </View>
             </View>
-            <View style={[styles.Rows,{marginLeft:20,marginTop:5}]}>
+            <View style={[styles.Rows,{marginTop:5}]}>
               <View style={styles.OrderStatusButton} >
                 <Text style={styles.OrderStatusButtonText}>
                   Delivered
@@ -78,7 +83,13 @@ const CompletedOrders = ({navigation}) => {
   }
   return (
     <View style={styles.mainContainer}>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />}
+      >
         {orders.map((data,i) =>
           OrderCardCompleted(data,i)
         )}

@@ -215,7 +215,9 @@ export const fetchGetFunction = async (route) => {
     });
   return res;
 }
-
+export const wait = (timeout) => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+}
 
 
 

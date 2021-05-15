@@ -4,7 +4,7 @@ import GuestNavigation from "./System/Route/GuestNavigation";
 import {NavigationContainer} from "@react-navigation/native";
 import AuthNavigation from "./System/Route/AuthNavigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {  mainColor } from "./System/Utility/MyLib";
+import { fetchPostFunction, mainColor, wait } from "./System/Utility/MyLib";
 import {CheckContext} from "./System/Utility/CheckContext";
 
 const CheckStack =  () =>
@@ -31,7 +31,10 @@ const CheckStack =  () =>
   const setRetrieveUserToken = async () => {
     let UserDetails= JSON.parse(await AsyncStorage.getItem('userDetails'));
     if (UserDetails !== null) {
-      setUserLocalDetails(UserDetails)
+      await fetchPostFunction('delivery_partner/refresh_details',{driver_id:UserDetails.id}).then(async response => {
+        await AsyncStorage.setItem('userDetails',JSON.stringify(response))
+        setUserLocalDetails(response)
+      })
     }
     setIsLoading(false)
   }

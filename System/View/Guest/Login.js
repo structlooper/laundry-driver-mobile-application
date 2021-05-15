@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text,   View } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import TopLogo from "../../Utility/TopLogo";
 import { MyNumericInput, MyButton, MyOutlineButton, mainColor, fetchPostFunction, MyToast } from "../../Utility/MyLib";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -34,7 +34,10 @@ const Login = ({ navigation }) => {
         Login
       </Text></View>
       <TopLogo />
+
       <View style={{ flex:.6 }}>
+        <ScrollView>
+
         <SafeAreaView style={styles.signupForm}>
           {MyNumericInput(number,onChangeNumber,'Phone Number',styles.input,'cellphone',true) }
 
@@ -54,9 +57,13 @@ const Login = ({ navigation }) => {
         <View style={styles.buttons}>
           { MyOutlineButton(() => navigation.navigate('Register'),'Register Now',styles.loginBtnOut,) }
         </View>
+        </ScrollView>
+
       </View>
 
     </View>
+
+
   );
 }
 const styles = StyleSheet.create({
