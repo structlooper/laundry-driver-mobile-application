@@ -44,6 +44,7 @@ export const MyNumericInput = (name,onChangeFunction,placeHolder,style,icon) => 
         onChangeText={onChangeFunction}
         value={name}
         placeholder={placeHolder}
+      maxLength={10}
       keyboardType='numeric'
       />
     </View>
@@ -159,7 +160,7 @@ export const fetchImagePostFunction = async (route,dom,profile_image) => {
   const createFormData = (photo, body) => {
     const data = new FormData();
 
-    data.append('profile_image', {
+    data.append('profile_picture', {
       name: photo.fileName,
       type: photo.type,
       uri:

@@ -6,28 +6,39 @@ import {
   ToastAndroid,
   SafeAreaView,
   StyleSheet,
-  ScrollView
-} from 'react-native';
+  ScrollView, Image,
+} from "react-native";
 import {
   MyButton,
   MyTextInput,
   BaseUrl,
   MyToast,
   MyNumericInput,
-  fetchPostFunction
-} from '../../Utility/MyLib';
+  fetchPostFunction, fetchImagePostFunction, fetchAuthPostFunction,
+} from "../../Utility/MyLib";
 import {logo} from '../../Utility/Images';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
-const submitSignupFrom = async (data , navi,loginLoading) => {
+const submitSignupFrom = async (data , navi,loginLoading,profileImage) => {
   let dom = {};
-  dom.customer_name = data.userName;
+  dom.delivery_boy_name = data.userName;
   dom.email = data.email;
   dom.phone_number = data.number;
   dom.fcm_token = await AsyncStorage.getItem('fcmToken');
 
-  let result = await fetchPostFunction('delivery_partner',dom);
+  let result;
+  if (profileImage !== null){
+    await fetchImagePostFunction('delivery_partner',dom,profileImage).then(async response => {
+      result = response;
+    })
+  }else{
+    await fetchAuthPostFunction('delivery_partner',dom).then(async response => {
+      result = response;
+    })
+  }
+  console.log('result',result)
   loginLoading(false)
   if (result.status === 0) {
     MyToast(result.message);
@@ -41,12 +52,13 @@ const submitSignupFrom = async (data , navi,loginLoading) => {
 };
 
 const Register = ({navigation}) => {
-    const [loginLoading, onLoginLoading] = React.useState(false);
-    const [username, onChangeUsername] = React.useState(null);
-    const [number, onChangeNumber] = React.useState(null);
-    const [email, onChangeEmail] = React.useState(null);
-    return (
-      <ScrollView>
+  const [loginLoading, onLoginLoading] = React.useState(false);
+  const [username, onChangeUsername] = React.useState(null);
+  const [number, onChangeNumber] = React.useState(null);
+  const [email, onChangeEmail] = React.useState(null);
+  const [profileImage, setProfileImage] = React.useState(null);
+  return (
+    <ScrollView>
 
       <View style={{flex: 1, backgroundColor: '#fff'}}>
         <View style={{alignItems: 'center', borderBottomWidth: 0.5, padding: 10}}>
@@ -64,19 +76,38 @@ const Register = ({navigation}) => {
               style={{
                 borderWidth: 1,
                 borderColor: 'grey',
-                borderRadius: 100 / 2,
-                padding: 20,
+                width: 150, height: 150, borderRadius:150/2,
                 backgroundColor: 'grey',
+                alignItems:'center',
+                justifyContent:'center'
               }}>
-              <FontAwesome5 name={'camera'} size={28} color={'white'} />
+              <TouchableOpacity
+                onPress={ () => {
+                  launchImageLibrary({},(response) => {
+                    if (response["didCancel"] === undefined){
+                      setProfileImage(response)
+                    }else{
+                      setProfileImage(null)
+                    }
+                  })
+                }}
+              >
+                {(profileImage === null)
+                  ?
+                  <FontAwesome5 name={'camera'} size={28} color={'white'} />
+                  :
+                  <Image source={{ uri:profileImage.uri }} style={{  width: 150, height: 150, borderRadius:150/2, }} />
+
+                }
+              </TouchableOpacity>
             </View>
             <View style={{alignItems: 'center', marginTop: 20}}>
-              <Text style={{fontSize: 15}}>Add Photo</Text>
+              <Text style={{fontSize: 15}}>
+                {(profileImage === null)? " Add Photo":""}
+              </Text>
             </View>
           </View>
-
           <View style={{marginTop: 25}}>
-
             <SafeAreaView style={styles.signupForm}>
               {MyTextInput(
                 username,
@@ -101,10 +132,11 @@ const Register = ({navigation}) => {
               )}
             </SafeAreaView>
             <View style={styles.buttons}>
+              {/*{ MyButton(signupController(navigation),'Register') }*/}
               {MyButton(
                 () => {
                   onLoginLoading(true)
-                  submitSignupFrom({userName:username, email:email, number:number}, navigation,onLoginLoading).then();
+                  submitSignupFrom({userName:username, email:email, number:number}, navigation,onLoginLoading,profileImage).then();
                 },
                 'Register Now',
                 '',
@@ -119,15 +151,13 @@ const Register = ({navigation}) => {
                 </Text>
               </TouchableOpacity>
             </View>
-
           </View>
-
         </View>
       </View>
-</ScrollView>
+    </ScrollView>
 
-);
-  };
+  );
+};
 
 const styles = StyleSheet.create({
   input: {
