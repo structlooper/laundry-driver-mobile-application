@@ -5,7 +5,7 @@ const Test = () => {
   return (
     <View>
       <Text>
-        Test
+        This page is under construction ...
       </Text>
     </View>
   );
