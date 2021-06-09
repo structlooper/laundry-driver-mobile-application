@@ -7,7 +7,7 @@ import {
   ScrollView,
   Linking,
   RefreshControl,
-  SafeAreaView,
+  SafeAreaView, Image,
 } from "react-native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { fetchAuthPostFunction, mainColor, MyButton, MyOutlineButton, MyToast ,wait} from "../../Utility/MyLib";
@@ -15,8 +15,9 @@ import Loader from "../../Utility/Loader";
 import NoData from "../../Utility/NoData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import moment from "moment";
-// import Geolocation from 'react-native-geolocation-service';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import OrderStatusChangeController from "../../Controller/OrderStatusChangeController";
+import NoProd from "../../Utility/NoProd";
 
 const OrderDetails = ({route}) => {
   const [activeSlide, onChangeActiveSlide] = React.useState(1);
@@ -29,24 +30,7 @@ const OrderDetails = ({route}) => {
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
-  const [location,setLocation] = React.useState({
-    lat:null,
-    lng:null
-  })
   useEffect(() => {
-      // Geolocation.getCurrentPosition(
-      //   (position) => {
-      //     setLocation({
-      //       lat:position.coords.latitude,
-      //       lng:position.coords.longitude
-      //     })
-      //   },
-      //   (error) => {
-      //     // See error code charts below.
-      //     console.log(error.code, error.message);
-      //   },
-      //   { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      // );
     getOrderDetails().then()
   },[refreshing])
   const getOrderDetails = async () => {
@@ -68,8 +52,37 @@ const OrderDetails = ({route}) => {
       return `google.navigation:q=${latLng}`;
     }
     return (
-      <View style={{ paddingVertical:20 }}>
-        <View style={Style.RowsContainer}>
+      <View style={{ minHeight:hp('90') }}>
+        <View style={[Style.RowsContainer,{marginTop:'5%'}]}>
+          <View style={Style.Row}>
+            <Text>
+              Selected services
+            </Text>
+            <Text style={Style.TimeDetails}>
+              {orderDetails.selected_services}
+            </Text>
+          </View>
+        </View>
+        <View style={[Style.RowsContainer,{marginTop:'5%'}]}>
+          <View style={Style.Row}>
+            <Text>
+              Estimated cloths
+            </Text>
+            <Text style={Style.TimeDetails}>
+              {orderDetails.estimated_cloths}
+            </Text>
+
+          </View>
+          <View style={Style.Row}>
+            <Text>
+              Added items
+            </Text>
+            <Text style={Style.TimeDetails}>
+              {orderDetails.additional_item_ids}
+            </Text>
+          </View>
+        </View>
+        <View style={[Style.RowsContainer,{marginTop:'5%'}]}>
           <View style={Style.Row}>
             <Text>
               pickup time
@@ -93,19 +106,19 @@ const OrderDetails = ({route}) => {
             </Text>
           </View>
         </View>
-        <View style={{marginTop:10,paddingHorizontal:20}}>
-          <View>
+        <View style={{marginTop:'10%',paddingHorizontal:'5%'}}>
+          <View style={{ marginBottom:hp('5') }}>
             <Text>Address</Text>
             <Text style={Style.TimeDetails}>{orderDetails.address_id.door_no}</Text>
             <Text style={Style.TimeDetails}>{orderDetails.address_id.address}</Text>
           </View>
           {MyButton(() => {(orderDetails.status === 7) ? MyToast('Order already delivered'):Linking.openURL(googleMapOpenUrl({ latitude: orderDetails.address_id.latitude, longitude: orderDetails.address_id.longitude }));},'Navigate',{marginTop:5},'near-me')}
         </View>
-        <View style={{marginTop:10,paddingHorizontal:20}}>
+        <View style={{marginTop:'5%',paddingHorizontal:'5%'}}>
           <View>
             <Text>Payment</Text>
-            <Text style={Style.TimeDetails}>₹ {orderDetails.total}</Text>
-            <Text>Online</Text>
+            <Text style={Style.TimeDetails}>₹ {orderDetails.total} ({ (orderDetails.payment_status === 2)?'Paid':'Due'})</Text>
+            <Text>{(orderDetails.payment_mode === 3)?'Not selected':(orderDetails.payment_mode===1)?'cash':'online'}</Text>
           </View>
            {/*{MyButton(() => {console.log('navigation')},'View Bill',{marginTop:10},'file-document')}*/}
         </View>
@@ -187,30 +200,40 @@ const OrderDetails = ({route}) => {
         </View>
       )
     }
-
+    const productRenderList = () => {
+      if ((orderDetails.products).length > 0){
+        return (orderDetails.products).map((data,i) =>
+          product(data,i)
+        )
+      }
+      return NoProd();
+    }
+    console.log('order',orderDetails.products)
     return (
-      <View style={{paddingVertical: 20,paddingHorizontal:20, height:'85%'}}>
-        <View>
-          {(orderDetails.products).map((data,i) =>
-              product(data,i)
-            )}
+      <View style={{paddingVertical: 20,paddingHorizontal:20 , minHeight:hp('80')}}>
+        <View style={{}}>
+          {MyButton(()=>{console.log('add product')},'Add products',{marginHorizontal:20},'plus')}
+          {productRenderList()}
+          <View style={{  paddingHorizontal:'5%',borderTopWidth:1 }}>
+            <View style={{flexDirection:'row',marginTop:20,paddingRight:'2%'}}>
+              <Text style={Style.LabelTitle}>Subtotal</Text>
+              <Text style={Style.LabelPrice}>₹ {orderDetails.sub_total}</Text>
+            </View>
+            <View style={{flexDirection:'row',paddingRight:'2%'}}>
+              <Text style={Style.LabelTitle}>Discount</Text>
+              <Text style={Style.LabelPrice}>₹ {orderDetails.discount}</Text>
+            </View>
+            <View style={{flexDirection:'row',paddingRight:'2%'}}>
+              <Text style={Style.LabelTitle}>Total</Text>
+              <Text style={Style.LabelPrice}>₹ {orderDetails.total}</Text>
+            </View>
+            <View style={{marginTop:10}}>
+              {orderBtn()}
+            </View>
+          </View>
+        </View>
 
-        </View>
-        <View style={{flexDirection:'row',marginTop:20}}>
-          <Text style={Style.LabelTitle}>Subtotal</Text>
-          <Text style={Style.LabelPrice}>₹ {orderDetails.sub_total}</Text>
-        </View>
-        <View style={{flexDirection:'row'}}>
-          <Text style={Style.LabelTitle}>Discount</Text>
-          <Text style={Style.LabelPrice}>₹ {orderDetails.discount}</Text>
-        </View>
-        <View style={{flexDirection:'row'}}>
-          <Text style={Style.LabelTitle}>Total</Text>
-          <Text style={Style.LabelPrice}>₹ {orderDetails.total}</Text>
-        </View>
-        <View style={{marginTop:10}}>
-          {orderBtn()}
-        </View>
+
       </View>
 
     )
@@ -232,7 +255,7 @@ const OrderDetails = ({route}) => {
           />
         }>
 
-      <View style={Style.ChildContainer}>
+      <View style={[Style.ChildContainer]}>
         <View style={Style.RowsContainer}>
           <View style={Style.Row}>
             <Text>
@@ -307,6 +330,7 @@ const Style = StyleSheet.create({
     flexDirection:'row',
     paddingVertical:10,
     paddingHorizontal:20,
+    height:hp('10')
   },
   Row:{
     flex:1
@@ -336,6 +360,6 @@ const Style = StyleSheet.create({
   LabelTitle:{
     fontSize:18,color:'#000',flex:1,marginLeft:5
   },
-  LabelPrice:{fontSize:18,color:'#000',marginRight:30},
+  LabelPrice:{fontSize:18,color:'#000'},
 })
 export default OrderDetails;

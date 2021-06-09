@@ -94,7 +94,7 @@ const BottomStack = () => {
         name="HomeTab"
         component={OrderSlider}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: 'Pickup & Deliveries',
 
           tabBarIcon:({color , size}) => (
             <FontAwesome5 name={'truck'} size={iconsSize} color={color} />
@@ -123,7 +123,7 @@ const BottomStack = () => {
 };
 const HomeScreenStack = ({navigation}) => {
   return (
-    <Stack.Navigator initialRouteName="Home"
+    <Stack.Navigator initialRouteName='Pickup & Deliveries'
                      screenOptions={({route}) => ({
                        headerTitle: getHeaderTitle(route),
 
@@ -142,7 +142,7 @@ const HomeScreenStack = ({navigation}) => {
                      })}
     >
       <Stack.Screen
-        name="Home"
+        name='Pickup & Deliveries'
         component={BottomStack}
         options={{
           headerLeft: () => (
