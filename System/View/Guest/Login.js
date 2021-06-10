@@ -10,9 +10,9 @@ const submitLoginFrom = async (number,navi,onLoginLoading) => {
   dom.fcm_token = await AsyncStorage.getItem('fcmToken');
   let result = await fetchPostFunction('delivery_partner/login',dom);
   onLoginLoading(false)
-  if (result.status == 0) {
+  if (result.status === 0) {
     MyToast(result.message);
-  } else if (result.status == 1) {
+  } else if (result.status === 1) {
     MyToast(result.message);
     navi.navigate('Otp', {mobile: number});
   } else {
@@ -45,7 +45,7 @@ const Login = ({ navigation }) => {
         <View style={styles.buttons}>
           { MyButton( ()=>{
             onLoginLoading(true)
-            submitLoginFrom(number, navigation,onLoginLoading)
+            submitLoginFrom(number, navigation,onLoginLoading).then()
           },'Login',styles.loginBtn,'',loginLoading) }
         </View>
         <View style={{ alignItems:'center' ,marginVertical: 10}}>

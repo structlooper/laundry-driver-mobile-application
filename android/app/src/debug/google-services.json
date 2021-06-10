@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "997084385614",
+    "project_id": "kryche-laundry-user",
+    "storage_bucket": "kryche-laundry-user.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997084385614:android:0f52b271a5f5764871ce1f",
+        "android_client_info": {
+          "package_name": "com.laundrydelivery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "997084385614-175oddeaf9u7e75963u6ol9ehs4k5hjf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1bOZ1H-c73LIgS04rncal5ahCEWTJB1c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "997084385614-175oddeaf9u7e75963u6ol9ehs4k5hjf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997084385614:android:17035c136764894b71ce1f",
+        "android_client_info": {
+          "package_name": "com.laundryuser"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "997084385614-175oddeaf9u7e75963u6ol9ehs4k5hjf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1bOZ1H-c73LIgS04rncal5ahCEWTJB1c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "997084385614-175oddeaf9u7e75963u6ol9ehs4k5hjf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

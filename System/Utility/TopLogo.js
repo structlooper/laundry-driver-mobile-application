@@ -6,12 +6,12 @@ const TopLogo = () => {
   return (
     <View  style={{flex:.5 ,width:'100%',alignItems:'center',justifyContent:'center'}}>
       <Image source={logo}
-             style={{width:'50%', height: '70%' }} />
-             <View style={{ alignItems:'center'}}>
-               <Text style={{fontSize:20}}>
-                 Sign in Now
-               </Text>
-             </View>
+             style={{width:'50%', height: '50%',resizeMode:'contain' }} />
+      <View style={{ alignItems:'center'}}>
+        <Text style={{fontSize:20}}>
+          Sign in Now
+        </Text>
+      </View>
     </View>
   );
 }
