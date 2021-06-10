@@ -18,8 +18,12 @@ import moment from "moment";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import OrderStatusChangeController from "../../Controller/OrderStatusChangeController";
 import NoProd from "../../Utility/NoProd";
+import { CheckContext } from "../../Utility/CheckContext";
 
-const OrderDetails = ({route}) => {
+const OrderDetails = ({route,navigation}) => {
+  const data = React.useContext(CheckContext);
+  const cart = data.showCart();
+  console.log('show',cart)
   const [activeSlide, onChangeActiveSlide] = React.useState(1);
   const {orderId} = route.params
   const [orderDetails,setOrderDetails] = React.useState(null)
@@ -208,11 +212,10 @@ const OrderDetails = ({route}) => {
       }
       return NoProd();
     }
-    console.log('order',orderDetails.products)
     return (
       <View style={{paddingVertical: 20,paddingHorizontal:20 , minHeight:hp('80')}}>
         <View style={{}}>
-          {MyButton(()=>{console.log('add product')},'Add products',{marginHorizontal:20},'plus')}
+          {MyButton(()=>{navigation.navigate('OrderDetailsAddProducts')},'Add products',{marginHorizontal:20},'plus')}
           {productRenderList()}
           <View style={{  paddingHorizontal:'5%',borderTopWidth:1 }}>
             <View style={{flexDirection:'row',marginTop:20,paddingRight:'2%'}}>

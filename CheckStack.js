@@ -9,7 +9,7 @@ import {CheckContext} from "./System/Utility/CheckContext";
 
 const CheckStack =  () =>
 {
-
+  const [products,setProducts] = React.useState([]);
   const [userLocalDetails,setUserLocalDetails] = React.useState(null)
   const [isLoading,setIsLoading] = React.useState(true)
 
@@ -25,6 +25,13 @@ const CheckStack =  () =>
     register:async () => {
       setUserLocalDetails(JSON.parse(await AsyncStorage.getItem('userDetails')))
       setIsLoading(false)
+    },
+    showCart: ()=>{
+      return products;
+    },
+    addCart: () => {
+      let pd = products;
+
     }
   }));
 
