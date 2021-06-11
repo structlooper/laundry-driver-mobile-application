@@ -83,23 +83,35 @@ const Orders = ({navigation}) => {
             </Text>
           </TouchableOpacity>
         )
-      }return (
-        <TouchableOpacity style={[styles.OrderStatusButton,{backgroundColor:'green'}]} onPress={() => {
-          OrderStatusChangeController(7,order.id).then(result => {
-            MyToast(result.message)
-            getOrders().then()
-          })
+      }else if(order.status > 5) {
+        return (
+          <TouchableOpacity style={[styles.OrderStatusButton,{backgroundColor:'green'}]} onPress={() => {
+            OrderStatusChangeController(7,order.id).then(result => {
+              MyToast(result.message)
+              getOrders().then()
+            })
 
-        }}>
-          <Text style={[styles.OrderStatusButtonText]}>
-            Mark Delivered
+          }}>
+            <Text style={[styles.OrderStatusButtonText]}>
+              Mark Delivered
+            </Text>
+          </TouchableOpacity>
+        )
+      }
+      return (
+        <View style={[styles.OrderStatusButton,{backgroundColor:'yellow'}]} >
+          <Text style={[styles.OrderStatusButtonText,{color:'#000'}]}>
+            Processing
           </Text>
-        </TouchableOpacity>
+        </View>
       )
 
     }
     return (
-      <TouchableOpacity onPress={()=>{navigation.navigate('HomeScreenStack',{screen:'OrderDetails',params:{orderId:order.id}})}} key={i}>
+      <TouchableOpacity onPress={async ()=>{
+        await AsyncStorage.setItem('orderId',(order.id).toString())
+        navigation.navigate('HomeScreenStack',{screen:'OrderDetails',params:{orderId:order.id}})
+      }} key={i}>
 
         <View style={styles.OrderCardContainer}>
           <View style={styles.OrderCardContainerRows}>
@@ -123,8 +135,8 @@ const Orders = ({navigation}) => {
               {orderStatusBtn()}
               <View style={[styles.DateAndTimeContainer,{marginTop:22,}]}>
                 <Text style={styles.LabelText}>Total amount</Text>
-                <Text>₹ {order.total}</Text>
-                <Text style={styles.LabelText}>Online</Text>
+                <Text>₹ {order.total} ({ (order.payment_status === 2)?'Paid':'Due'})</Text>
+                <Text style={styles.LabelText}>{(order.payment_mode === 3)?'Not selected':(order.payment_mode===1)?'cash':'online'}</Text>
 
               </View>
             </View>

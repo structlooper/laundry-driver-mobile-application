@@ -4,12 +4,13 @@ import GuestNavigation from "./System/Route/GuestNavigation";
 import {NavigationContainer} from "@react-navigation/native";
 import AuthNavigation from "./System/Route/AuthNavigation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fetchPostFunction, mainColor, wait } from "./System/Utility/MyLib";
+import { fetchAuthPostFunction, fetchPostFunction, mainColor, wait } from "./System/Utility/MyLib";
 import {CheckContext} from "./System/Utility/CheckContext";
 
 const CheckStack =  () =>
 {
   const [products,setProducts] = React.useState([]);
+  const [order,setOrder] = React.useState([]);
   const [userLocalDetails,setUserLocalDetails] = React.useState(null)
   const [isLoading,setIsLoading] = React.useState(true)
 
@@ -26,15 +27,28 @@ const CheckStack =  () =>
       setUserLocalDetails(JSON.parse(await AsyncStorage.getItem('userDetails')))
       setIsLoading(false)
     },
-    showCart: ()=>{
-      return products;
+    showOrder: ()=>{
+      return order;
     },
-    addCart: () => {
-      let pd = products;
-
-    }
+    showServerOrder: ()=>{
+      return new Promise(resolve => {
+        getCurrentSelectedOrder().then(res=>{
+          setOrder(res);
+          resolve(res);
+        })
+      })
+    },
   }));
 
+  const getCurrentSelectedOrder = async () => {
+    let driverDetails = JSON.parse(await AsyncStorage.getItem('userDetails'))
+    let orderId = await AsyncStorage.getItem('orderId')
+    return new Promise(resolve => {
+      fetchAuthPostFunction('delivery_partner/orders/details',{driver_id:driverDetails.id,order_id:orderId}).then(response => {
+        resolve(response)
+      })
+    })
+  }
   const setRetrieveUserToken = async () => {
     let UserDetails= JSON.parse(await AsyncStorage.getItem('userDetails'));
     if (UserDetails !== null) {

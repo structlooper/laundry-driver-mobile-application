@@ -19,11 +19,11 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 import OrderStatusChangeController from "../../Controller/OrderStatusChangeController";
 import NoProd from "../../Utility/NoProd";
 import { CheckContext } from "../../Utility/CheckContext";
+import { useIsFocused } from "@react-navigation/native";
 
 const OrderDetails = ({route,navigation}) => {
-  const data = React.useContext(CheckContext);
-  const cart = data.showCart();
-  console.log('show',cart)
+  const focus = useIsFocused();
+  const {showServerOrder} = React.useContext(CheckContext);
   const [activeSlide, onChangeActiveSlide] = React.useState(1);
   const {orderId} = route.params
   const [orderDetails,setOrderDetails] = React.useState(null)
@@ -35,21 +35,18 @@ const OrderDetails = ({route,navigation}) => {
   }, []);
 
   useEffect(() => {
-    getOrderDetails().then()
-  },[refreshing])
-  const getOrderDetails = async () => {
-    let driverDetails = JSON.parse(await AsyncStorage.getItem('userDetails'))
-    fetchAuthPostFunction('delivery_partner/orders/details',{driver_id:driverDetails.id,order_id:orderId}).then(response => {
-      setOrderDetails(response)
+   getOrderDetails()
+  },[refreshing,focus])
+  const getOrderDetails  = async => {
+    showServerOrder().then(order => {
+      setOrderDetails(order)
     })
   }
-
   if (orderDetails === null){
     return <Loader/>
   }else if (Object.keys(orderDetails).length === 0 && orderDetails.constructor === Object){
     return NoData('details')
   }
-
   const OrderInfo = () => {
     const googleMapOpenUrl = ({ latitude, longitude }) => {
       const latLng = `${latitude},${longitude}`;
@@ -77,14 +74,19 @@ const OrderDetails = ({route,navigation}) => {
             </Text>
 
           </View>
-          <View style={Style.Row}>
-            <Text>
-              Added items
-            </Text>
-            <Text style={Style.TimeDetails}>
-              {orderDetails.additional_item_ids}
-            </Text>
-          </View>
+          {(orderDetails.additional_item_ids !== null)?
+            (orderDetails.additional_item_ids !== '')?
+            <View style={Style.Row}>
+              <Text>
+                Added items
+              </Text>
+              <Text style={Style.TimeDetails}>
+                {orderDetails.additional_item_ids}
+              </Text>
+            </View>: null :
+            null
+          }
+
         </View>
         <View style={[Style.RowsContainer,{marginTop:'5%'}]}>
           <View style={Style.Row}>
@@ -140,7 +142,7 @@ const OrderDetails = ({route,navigation}) => {
             <TouchableOpacity style={Style.OrderStatusButton} onPress={() => {
               OrderStatusChangeController(3,orderId).then(result => {
                 MyToast(result.message)
-                getOrderDetails().then()
+                getOrderDetails()
               })
             }}>
               <FontAwesome5 name={'check'} size={20} color={'white'} style={{textAlign:'center'}}/>
@@ -148,7 +150,7 @@ const OrderDetails = ({route,navigation}) => {
             <TouchableOpacity style={[Style.OrderStatusButton,{backgroundColor:'red'}]} onPress={() => {
               OrderStatusChangeController(0,orderId).then(result => {
                 MyToast(result.message)
-                getOrderDetails().then()
+                getOrderDetails()
               })
             }}>
               <FontAwesome5 name={'times'} size={20} color={'white'} style={{textAlign:'center'}} />
@@ -157,29 +159,36 @@ const OrderDetails = ({route,navigation}) => {
         )
       }else if(orderDetails.status < 4){
         return MyButton(() => {
-          OrderStatusChangeController(4,orderId).then(result => {
-            MyToast(result.message)
-            getOrderDetails().then()
-          })
+          if (orderDetails.products.length > 0){
+            OrderStatusChangeController(4,orderId).then(result => {
+              MyToast(result.message)
+              getOrderDetails()
+            })
+          }else{
+            MyToast('Please add cloths!!')
+          }
         },'Mark Picked','','truck-check')
       }else if(orderDetails.status === 5){
         return MyButton(() => {
           OrderStatusChangeController(6,orderId).then(result => {
             MyToast(result.message)
-            getOrderDetails().then()
+            getOrderDetails()
           })
         },'Out for Delivery',{borderWidth:1,borderColor:mainColor},'check')
 
       } else if (orderDetails.status === 7){
         return MyOutlineButton(() => {console.log('Delivered')},'Delivered',{borderWidth:1,borderColor:mainColor},'check')
-      }else{
+      }else if (orderDetails.status === 6){
         return  MyButton(() => {
           OrderStatusChangeController(7,orderId).then(result => {
             MyToast(result.message)
-            getOrderDetails().then()
+            getOrderDetails()
           })
         },'Mark Delivered','','truck-check')
+      }else{
+        return MyOutlineButton(() => {console.log('Delivered')},'Processing',{borderWidth:1,borderColor:mainColor},)
       }
+
     }
     const product = (data,i) => {
       return (
@@ -190,13 +199,13 @@ const OrderDetails = ({route,navigation}) => {
                 {data.qty}
               </Text>
             </View>
-            <View style={{flex:2.5}}>
+            <View style={{width:wp('55'),marginHorizontal:wp('5')}}>
               <Text style={{ fontSize:15,color: 'black'}}>
                 {data.product_name}({data.service_name})
               </Text>
             </View>
-            <View style={{flex:1}}>
-              <Text style={{ fontSize:15,color: 'black',marginLeft:40}}>
+            <View style={{}}>
+              <Text style={{ fontSize:15,color: 'black',}}>
                 ₹ {data.price}
               </Text>
             </View>
@@ -213,29 +222,40 @@ const OrderDetails = ({route,navigation}) => {
       return NoProd();
     }
     return (
-      <View style={{paddingVertical: 20,paddingHorizontal:20 , minHeight:hp('80')}}>
-        <View style={{}}>
-          {MyButton(()=>{navigation.navigate('OrderDetailsAddProducts')},'Add products',{marginHorizontal:20},'plus')}
+      <View style={{paddingVertical: 20,paddingHorizontal:20 , minHeight:hp('70')}}>
+        <View style={{  }}>
+          {(orderDetails.status === 3)?MyButton(()=>{navigation.navigate('OrderDetailsAddProducts')},'Add cloths',{marginHorizontal:20},'plus'):null}
+          {(orderDetails.status > 3)? (orderDetails.status < 7)? MyButton(()=>{console.log('request_pay')},'Request payment',{marginHorizontal:20},'currency-inr'):null:null}
           {productRenderList()}
-          <View style={{  paddingHorizontal:'5%',borderTopWidth:1 }}>
-            <View style={{flexDirection:'row',marginTop:20,paddingRight:'2%'}}>
-              <Text style={Style.LabelTitle}>Subtotal</Text>
-              <Text style={Style.LabelPrice}>₹ {orderDetails.sub_total}</Text>
-            </View>
+        </View>
+        <View style={{  paddingHorizontal:'5%',borderTopWidth:1,position:'absolute',left:0,right:0,bottom:0 }}>
+          <View style={{flexDirection:'row',marginTop:20,paddingRight:'2%'}}>
+            <Text style={Style.LabelTitle}>Subtotal</Text>
+            <Text style={Style.LabelPrice}>₹ {orderDetails.sub_total}</Text>
+          </View>
+          <View style={{flexDirection:'row',paddingRight:'2%'}}>
+            <Text style={Style.LabelTitle}>Discount</Text>
+            <Text style={Style.LabelPrice}>₹ {orderDetails.discount}</Text>
+          </View>
+          <View style={{flexDirection:'row',paddingRight:'2%'}}>
+            <Text style={Style.LabelTitle}>Delivery charges</Text>
+            <Text style={Style.LabelPrice}>₹ {orderDetails.delivery_changes}</Text>
+          </View>
+          {(orderDetails.mem_total_discount > 0)?
             <View style={{flexDirection:'row',paddingRight:'2%'}}>
-              <Text style={Style.LabelTitle}>Discount</Text>
-              <Text style={Style.LabelPrice}>₹ {orderDetails.discount}</Text>
+              <Text style={Style.LabelTitle}>Membership discount</Text>
+              <Text style={Style.LabelPrice}>₹ {orderDetails.mem_total_discount}</Text>
             </View>
-            <View style={{flexDirection:'row',paddingRight:'2%'}}>
-              <Text style={Style.LabelTitle}>Total</Text>
-              <Text style={Style.LabelPrice}>₹ {orderDetails.total}</Text>
-            </View>
-            <View style={{marginTop:10}}>
-              {orderBtn()}
-            </View>
+            :null
+          }
+          <View style={{flexDirection:'row',paddingRight:'2%'}}>
+            <Text style={Style.LabelTitle}>Total</Text>
+            <Text style={Style.LabelPrice}>₹ {orderDetails.total}</Text>
+          </View>
+          <View style={{marginTop:10}}>
+            {orderBtn()}
           </View>
         </View>
-
 
       </View>
 
@@ -361,7 +381,7 @@ const Style = StyleSheet.create({
     color:'#fff'
   },
   LabelTitle:{
-    fontSize:18,color:'#000',flex:1,marginLeft:5
+    fontSize:18,color:'#000',width:wp('72'),marginLeft:5
   },
   LabelPrice:{fontSize:18,color:'#000'},
 })
