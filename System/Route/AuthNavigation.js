@@ -23,6 +23,7 @@ import TermsAndConditions from "../View/TermsAndConditions";
 import Faq from "../View/Faq/Faq";
 import Notifications from "../View/Notifications";
 import OrderDetails from "../View/Orders/OrderDetails";
+import AddProducts from "../View/Orders/AddProducts";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -179,6 +180,16 @@ const HomeScreenStack = ({navigation}) => {
 
         options={({route}) => ({
           title: 'Order Details',
+        })}
+
+
+      />
+      <Stack.Screen
+        name="OrderDetailsAddProducts"
+        component={ AddProducts }
+
+        options={({route}) => ({
+          title: 'Add Products',
         })}
 
 

@@ -105,8 +105,7 @@ export const MyOptField = (name,onChangeFunction,placeHolder,style,icon,autofocu
   )
 }
 export const MyToast = (message) => {
-  return ToastAndroid.showWithGravityAndOffset(message, ToastAndroid.LONG,ToastAndroid.TOP,150,100);
-
+  return ToastAndroid.showWithGravityAndOffset(message, ToastAndroid.LONG,ToastAndroid.BOTTOM,0,150);
 }
 export const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
