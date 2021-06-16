@@ -9,7 +9,8 @@ const ProductController =  (productId,qty) => {
     dom.qty = qty;
     dom.order_id = orderId
     fetchAuthPostFunction('delivery_partner/order',dom).then(result => {
-      MyToast(result.message)
+      // console.log('res',result)
+      // MyToast(result.message)
       if (result.status === 1){
         resolve(true)
       }

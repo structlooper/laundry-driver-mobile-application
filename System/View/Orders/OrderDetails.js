@@ -10,7 +10,15 @@ import {
   SafeAreaView, Image,
 } from "react-native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { fetchAuthPostFunction, mainColor, MyButton, MyOutlineButton, MyToast ,wait} from "../../Utility/MyLib";
+import {
+  fetchAuthPostFunction,
+  mainColor,
+  MyButton, MyNumericInput,
+  MyOutlineButton,
+  MyTextInput,
+  MyToast,
+  wait,
+} from "../../Utility/MyLib";
 import Loader from "../../Utility/Loader";
 import NoData from "../../Utility/NoData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -20,6 +28,7 @@ import OrderStatusChangeController from "../../Controller/OrderStatusChangeContr
 import NoProd from "../../Utility/NoProd";
 import { CheckContext } from "../../Utility/CheckContext";
 import { useIsFocused } from "@react-navigation/native";
+import Modal from "react-native-modal";
 
 const OrderDetails = ({route,navigation}) => {
   const focus = useIsFocused();
@@ -28,6 +37,9 @@ const OrderDetails = ({route,navigation}) => {
   const {orderId} = route.params
   const [orderDetails,setOrderDetails] = React.useState(null)
   const [refreshing, setRefreshing] = React.useState(false);
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [itemCount, setItemCount] = React.useState(null);
+  const [itemProduct, setItemProduct] = React.useState(null);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -66,12 +78,15 @@ const OrderDetails = ({route,navigation}) => {
         </View>
         <View style={[Style.RowsContainer,{marginTop:'5%'}]}>
           <View style={Style.Row}>
-            <Text>
-              Estimated cloths
-            </Text>
-            <Text style={Style.TimeDetails}>
-              {orderDetails.estimated_cloths}
-            </Text>
+            <View>
+              <Text>
+                Estimated cloths
+              </Text>
+              <Text style={Style.TimeDetails}>
+                {orderDetails.estimated_cloths}
+              </Text>
+
+            </View>
 
           </View>
           {(orderDetails.additional_item_ids !== null)?
@@ -135,6 +150,7 @@ const OrderDetails = ({route,navigation}) => {
 
 
   const ClothList = () => {
+
     const orderBtn = () => {
       if (orderDetails.status === 2){
         return (
@@ -194,17 +210,29 @@ const OrderDetails = ({route,navigation}) => {
       return (
         <View style={{ paddingHorizontal:10}} key={i}>
           <View style={{flexDirection:'row' ,paddingVertical:12 }}>
-            <View style={{flex:.5}}>
+            <View style={{flex:.2}}>
               <Text style={{ fontSize:15,color: mainColor,fontWeight: 'bold'}}>
-                {data.qty}
+                {data.qty} {data.unit}
               </Text>
             </View>
-            <View style={{width:wp('55'),marginHorizontal:wp('5')}}>
-              <Text style={{ fontSize:15,color: 'black'}}>
-                {data.product_name}({data.service_name})
-              </Text>
+            <View style={{flex:.8,marginHorizontal:wp('5')}}>
+              <View style={{ flexDirection:'row' }}>
+                <Text style={{ fontSize:15,color: 'black'}}>
+                  {data.product_name}  ({data.service_name})
+                </Text>
+                <TouchableOpacity
+                onPress={() => {
+                  setItemProduct(data.product_id)
+                  setItemCount(data.item_count?data.item_count.toString():null)
+                  setIsModalVisible(!isModalVisible)
+                }}
+                >
+                  <Text style={{ color:mainColor }}> ({data.item_count ?? 'add item count'})</Text>
+                </TouchableOpacity>
+              </View>
+
             </View>
-            <View style={{}}>
+            <View style={{ flex:.2 }}>
               <Text style={{ fontSize:15,color: 'black',}}>
                 ₹ {data.price}
               </Text>
@@ -221,8 +249,63 @@ const OrderDetails = ({route,navigation}) => {
       }
       return NoProd();
     }
+    const addItemCountModal = () => {
+      return (
+        <Modal isVisible={isModalVisible} >
+          <View style={{flex: .4,borderWidth:.2,backgroundColor:'#eee',}}>
+            <View style={{borderBottomWidth:.5,paddingBottom:10,padding:10}}>
+              <View>
+                {MyButton(() => {setIsModalVisible(!isModalVisible)},'Back','','arrow-left')}
+              </View>
+            </View>
+            <View style={{ backgroundColor:'#fff',flex:1,paddingVertical:hp('5'),alignItems:'center'}}>
+              <View style={{ flexDirection:'row' }}>
+                {MyNumericInput(
+                  itemCount,
+                  setItemCount,
+                  'Enter item count here',
+                  {
+                    backgroundColor:'#fff',
+                    width: wp('60')
+                  }
+                )}
+              </View>
+              <View style={{ flexDirection:'row',marginTop:hp(5) }}>
+                {MyButton(
+                  ()=>{
+                    let dom = {
+                      order_id: orderId,
+                      product_id: itemProduct,
+                      item_count: itemCount,
+                    }
+                      if (itemCount){
+                      fetchAuthPostFunction('delivery_partner/order/update_count',dom).then(res=>{
+                        if (res.status === 0){
+                          MyToast(res.message)
+                        }else{
+                          getOrderDetails()
+                          setIsModalVisible(!isModalVisible)
+                          setItemCount(null)
+                        }
+                      })
+                    }else{
+                      MyToast('Enter count first!!')
+                    }
+
+                  },
+                  'Save',
+                  {width: wp('60')},
+                )}
+              </View>
+
+            </View>
+          </View>
+        </Modal>
+      )
+    }
     return (
       <View style={{paddingVertical: 20,paddingHorizontal:20 , minHeight:hp('70')}}>
+        {addItemCountModal()}
         <View style={{  }}>
           {(orderDetails.status === 3)?MyButton(()=>{navigation.navigate('OrderDetailsAddProducts')},'Add cloths',{marginHorizontal:20},'plus'):null}
           {(orderDetails.status > 3)? (orderDetails.status < 7)? MyButton(()=>{console.log('request_pay')},'Request payment',{marginHorizontal:20},'currency-inr'):null:null}
