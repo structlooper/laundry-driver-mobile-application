@@ -5,7 +5,7 @@ import {
   fetchAuthPostFunction,
   fetchGetFunction,
   mainColor,
-  MyButton,
+  MyButton, MyNumericInput,
   MyTextInput,
 } from "../../Utility/MyLib";
 import Loader from "../../Utility/Loader";
@@ -79,7 +79,7 @@ const AddProducts = ({navigation}) => {
     }else if (productList.length > 0){
       const Btn = (productId,setLoader,i,num,qty) => {
         let icon;
-        if(num === 1){
+        if(num === '++1'){
           icon = 'plus'
         }else if(num === -1){
           icon = 'minus'
@@ -101,9 +101,20 @@ const AddProducts = ({navigation}) => {
                   })
                 }
               })
+              let newQty = 0;
+              // if (qty > 0){
+                if (num === '++1'){
+                  newQty = qty+1
+                }else if (qty < 2 && num === -1){
+                  newQty = 0;
+                }else{
+                  newQty = qty-1;
+                }
+              // }
               setOrderProducts({
                 ...orderProducts,
-                [productId]:(qty > 0)?(num === 1)?qty+1:qty-1:(num === 1)?qty+1:0
+                [productId]:newQty
+
               })
               setLoader(false)
             }}
@@ -131,12 +142,33 @@ const AddProducts = ({navigation}) => {
                         { (loader === i+'minus') ? Loader() : Btn(data.id,setLoader,i,-1,Q)}
                       </View>
                       <View style={{}}>
-                        <Text>
-                          {Q}
-                        </Text>
+                        {MyNumericInput(
+                          (Q === 0)?null:Q.toString(),
+                          (qty)=>{
+                            ProductController(data.id, qty).then(bool => {
+                              if (bool){
+                                showServerOrder().then(res=>{
+                                  order=res;
+                                })
+                              }
+                            })
+                            setOrderProducts({
+                              ...orderProducts,
+                              [data.id]:qty
+                            })
+                          },
+                          '0',
+                          {
+                            backgroundColor: '#fff',
+                            flex: 1,
+                            height: hp(2),
+                            paddingVertical:hp(.3),
+                            justifyContent:"center"
+                          }
+                        )}
                       </View>
                       <View>
-                        { (loader === i+'plus') ? Loader() : Btn(data.id,setLoader,i,1,Q)}
+                        { (loader === i+'plus') ? Loader() : Btn(data.id,setLoader,i,'++1',Q)}
                       </View>
                     </View>
                   </View>
