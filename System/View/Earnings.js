@@ -42,7 +42,6 @@ const Earning = () => {
   }, []);
   const getEarningDetails = async () => {
     let userDetails = JSON.parse(await AsyncStorage.getItem('userDetails'));
-    console.log('userDetails',userDetails)
     setUserDetails(userDetails)
     setWalletAmount(userDetails.wallet)
     fetchAuthPostFunction('delivery_partner/earnings',{driver_id: userDetails.id}).then(response => {

@@ -25,6 +25,7 @@ import Notifications from "../View/Notifications";
 import OrderDetails from "../View/Orders/OrderDetails";
 import AddProducts from "../View/Orders/AddProducts";
 import PriceList from "../View/Price/PriceList";
+import RequestPayment from "../View/Payment/RequestPayment";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -191,6 +192,16 @@ const HomeScreenStack = ({navigation}) => {
 
         options={({route}) => ({
           title: 'Add Products',
+        })}
+
+
+      />
+      <Stack.Screen
+        name="requestPayment"
+        component={ RequestPayment }
+
+        options={({route}) => ({
+          title: 'Payment',
         })}
 
 

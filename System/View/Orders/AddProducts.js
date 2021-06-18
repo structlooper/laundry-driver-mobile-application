@@ -161,8 +161,7 @@ const AddProducts = ({navigation}) => {
                           {
                             backgroundColor: '#fff',
                             flex: 1,
-                            height: hp(2),
-                            paddingVertical:hp(.3),
+                            height: hp(3),
                             justifyContent:"center"
                           }
                         )}

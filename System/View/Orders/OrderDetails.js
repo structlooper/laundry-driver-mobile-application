@@ -40,6 +40,7 @@ const OrderDetails = ({route,navigation}) => {
   const [isModalVisible, setIsModalVisible] = React.useState(false);
   const [itemCount, setItemCount] = React.useState(null);
   const [itemProduct, setItemProduct] = React.useState(null);
+  const [billLoader, setBillLoader] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -215,9 +216,9 @@ const OrderDetails = ({route,navigation}) => {
                 {data.qty} {data.unit}
               </Text>
             </View>
-            <View style={{flex:.8,marginHorizontal:wp('5')}}>
-              <View style={{ flexDirection:'row' }}>
-                <Text style={{ fontSize:15,color: 'black'}}>
+            <View style={{flex:.8,}}>
+              <View style={{ flexDirection:"row" }}>
+                <Text style={{ fontSize:wp('4'),color: 'black'}}>
                   {data.product_name}  ({data.service_name})
                 </Text>
                 <TouchableOpacity
@@ -226,6 +227,7 @@ const OrderDetails = ({route,navigation}) => {
                   setItemCount(data.item_count?data.item_count.toString():null)
                   setIsModalVisible(!isModalVisible)
                 }}
+                style={{ flex:1 }}
                 >
                   <Text style={{ color:mainColor }}> ({data.item_count ?? 'add item count'})</Text>
                 </TouchableOpacity>
@@ -252,7 +254,7 @@ const OrderDetails = ({route,navigation}) => {
     const addItemCountModal = () => {
       return (
         <Modal isVisible={isModalVisible} >
-          <View style={{flex: .4,borderWidth:.2,backgroundColor:'#eee',}}>
+          <View style={{height:hp(40),borderWidth:.2,backgroundColor:'#eee',}}>
             <View style={{borderBottomWidth:.5,paddingBottom:10,padding:10}}>
               <View>
                 {MyButton(() => {setIsModalVisible(!isModalVisible)},'Back','','arrow-left')}
@@ -303,12 +305,39 @@ const OrderDetails = ({route,navigation}) => {
         </Modal>
       )
     }
+    const requestPaymentFunction = async () => {
+      fetchAuthPostFunction('payment/status',{
+        order_id:orderId,
+        payment_status:4
+      }).then(response => {
+        if (response.status === 1){
+          MyToast('Bill & Payment request send successfully.')
+        }else{
+          MyToast(response.message)
+        }
+        getOrderDetails()
+        setBillLoader(false)
+      })
+    }
     return (
       <View style={{paddingVertical: 20,paddingHorizontal:20 , minHeight:hp('70')}}>
         {addItemCountModal()}
         <View style={{  }}>
           {(orderDetails.status === 3)?MyButton(()=>{navigation.navigate('OrderDetailsAddProducts')},'Add cloths',{marginHorizontal:20},'plus'):null}
-          {(orderDetails.status > 3)? (orderDetails.status < 7)? MyButton(()=>{console.log('request_pay')},'Request payment',{marginHorizontal:20},'currency-inr'):null:null}
+          {(orderDetails.status > 3)? (orderDetails.status < 7 && orderDetails.payment_status !== 2)?
+            (orderDetails.payment_status === 1)?
+            MyButton(()=>{
+              setBillLoader(true)
+              requestPaymentFunction().then()
+            },'Request Payment',{flex:1,marginRight: wp(1),borderRadius: 40/2},'currency-inr',billLoader)
+              :
+            <View style={{  }}>
+              {  MyButton(()=>{
+                setBillLoader(true)
+                requestPaymentFunction().then()
+              },'Request payment again',{flex:1,marginRight: wp(1),borderRadius: 40/2},'currency-inr',billLoader)}
+            </View>
+            :null:null}
           {productRenderList()}
         </View>
         <View style={{  paddingHorizontal:'5%',borderTopWidth:1,position:'absolute',left:0,right:0,bottom:0 }}>
