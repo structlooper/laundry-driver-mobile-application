@@ -4,6 +4,8 @@ import {
   View,  Text, ToastAndroid, Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+
 
 export const mainColor = '#5414b3';
 export const AppName = 'KRYCHE';
@@ -59,7 +61,7 @@ export const MyButton = (onPress,TextOnIt,style,icon,loading) => {
       onPress={onPress}
       loading={loading?true:false}
       uppercase={false}
-      contentStyle={{ height: 50 }}
+      contentStyle={{ height: hp('6') }}
       icon={icon}
     >
       {TextOnIt}
@@ -74,7 +76,7 @@ export const MyOutlineButton = (onPress,TextOnIt,style,icon,loading) => {
       onPress={onPress}
       loading={loading?true:false}
       uppercase={false}
-      contentStyle={{ height: 50 }}
+      contentStyle={{ height: hp('6') }}
       icon={icon}
     >
       <Text>
