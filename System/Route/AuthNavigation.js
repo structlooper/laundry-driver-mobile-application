@@ -26,6 +26,7 @@ import OrderDetails from "../View/Orders/OrderDetails";
 import AddProducts from "../View/Orders/AddProducts";
 import PriceList from "../View/Price/PriceList";
 import RequestPayment from "../View/Payment/RequestPayment";
+import Barcodes from "../View/PayBarcodes/Barcodes";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -371,6 +372,38 @@ const PriceListScreenStack = ({navigation}) => {
     </Stack.Navigator>
   );
 };
+const BarcodesScreenStack = ({navigation}) => {
+  return (
+    <Stack.Navigator
+      initialRouteName="Barcode"
+      screenOptions={{
+        headerRight: () => (
+          <TouchableOpacity onPress={() => {navigation.navigate('Notifications')}}>
+            <FontAwesome5 name={'bell'} size={iconsSize} color={mainColor} style={{marginRight:15}} />
+          </TouchableOpacity>
+        ),
+        headerStyle: {
+          backgroundColor: '#fff',
+        },
+        headerTintColor: '#000',
+        headerLeft: () => (
+          <NavigationDrawerStructure
+            navigationProps={navigation}
+          />
+        ),
+      }}>
+      <Stack.Screen
+        name="Barcode"
+        component={ Barcodes }
+        options={{
+          title: 'Barcodes',
+        }}
+      />
+
+
+    </Stack.Navigator>
+  );
+};
 const MainNavigator = () => {
   return (
     // <NavigationContainer>
@@ -407,6 +440,17 @@ const MainNavigator = () => {
 
         }}
         component={PriceListScreenStack}
+      />
+      <Drawer.Screen
+        name="BarcodesScreenStack"
+        options={{
+          drawerLabel: 'Barcodes',
+          drawerIcon:({color , size}) => (
+            <FontAwesome5 name={'barcode'} size={size - 2} color={color} style={{marginRight:-20,marginLeft:4}} />
+          )
+
+        }}
+        component={BarcodesScreenStack}
       />
       <Drawer.Screen
         name="aboutUs"
