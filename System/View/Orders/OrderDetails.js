@@ -319,6 +319,21 @@ const OrderDetails = ({route,navigation}) => {
         setBillLoader(false)
       })
     }
+    const verifyPaymentFunction = async () => {
+      fetchAuthPostFunction('payment/status',{
+        order_id:orderId,
+        payment_status:2,
+        payment_methods:1
+      }).then(response => {
+        if (response.status === 1){
+          MyToast('Order verified successfully.')
+        }else{
+          MyToast(response.message)
+        }
+        getOrderDetails()
+        setBillLoader(false)
+      })
+    }
     return (
       <View style={{paddingVertical: 20,paddingHorizontal:20 , minHeight:hp('70')}}>
         {addItemCountModal()}
@@ -331,6 +346,14 @@ const OrderDetails = ({route,navigation}) => {
               requestPaymentFunction().then()
             },'Request Payment',{flex:1,marginRight: wp(1),borderRadius: 40/2},'currency-inr',billLoader)
               :
+              (orderDetails.payment_status === 3)?
+                <View style={{  }}>
+                  {  MyButton(()=>{
+                    setBillLoader(true)
+                    verifyPaymentFunction().then()
+                  },'Verified Payment',{flex:1,marginRight: wp(1),borderRadius: 40/2},'currency-inr',billLoader)}
+                </View>
+                :
             <View style={{  }}>
               {  MyButton(()=>{
                 setBillLoader(true)
