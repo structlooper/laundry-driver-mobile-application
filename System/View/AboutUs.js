@@ -40,7 +40,7 @@ const AboutUs = () => {
       <ScrollView style={styles.mainContainer}>
         <View style={styles.AppDetailsContainer}>
           <Image source={logo} style={styles.AppImage} />
-          <Text style={styles.AppName}>{AppName}</Text>
+          {/*<Text style={styles.AppName}>{AppName}</Text>*/}
         </View>
         <ScrollView style={styles.AppDescription}>
           <Text style={styles.AppDescriptionText}>
@@ -82,7 +82,8 @@ const styles = StyleSheet.create({
   AppDetailsContainer:{
     alignItems:'center',
     // justifyContent:'center',
-    marginLeft:60,
+    // marginLeft:60,
+    justifyContent:'center',
     flexDirection:'row',
 
   },

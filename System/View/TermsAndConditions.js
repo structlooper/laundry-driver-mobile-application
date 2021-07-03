@@ -42,7 +42,7 @@ const TermsAndConditions = () => {
         <View style={styles.childContainer}>
           <View style={styles.AppDetailsContainer}>
             <Image source={logo} style={styles.AppImage} />
-            <Text style={styles.AppName}>{AppName}</Text>
+            {/*<Text style={styles.AppName}>{AppName}</Text>*/}
           </View>
         </View>
         {
@@ -71,7 +71,8 @@ const styles = StyleSheet.create({
   AppDetailsContainer:{
     alignItems:'center',
     // justifyContent:'center',
-    marginLeft:60,
+    // marginLeft:60,
+    justifyContent:'center',
     flexDirection:'row',
 
   },
