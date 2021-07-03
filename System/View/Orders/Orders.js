@@ -55,7 +55,7 @@ const Orders = ({navigation}) => {
 
         )
       }
-      if (order.status < 4){
+      if (order.status === 3){
         return (
           <TouchableOpacity style={styles.OrderStatusButton} onPress={() => {
             OrderStatusChangeController(4,order.id).then(result => {
@@ -68,6 +68,14 @@ const Orders = ({navigation}) => {
               Mark Pickup
             </Text>
           </TouchableOpacity>
+        )
+      }else if(order.status === 4){
+        return (
+          <View style={[styles.OrderStatusButton,{backgroundColor:'yellow'}]} >
+            <Text style={[styles.OrderStatusButtonText,{color:'#000'}]}>
+              Processing
+            </Text>
+          </View>
         )
       }else if(order.status === 5){
         return (
@@ -83,7 +91,7 @@ const Orders = ({navigation}) => {
             </Text>
           </TouchableOpacity>
         )
-      }else if(order.status > 5) {
+      }else if(order.status === 6 ) {
         return (
           <TouchableOpacity style={[styles.OrderStatusButton,{backgroundColor:'green'}]} onPress={() => {
             OrderStatusChangeController(7,order.id).then(result => {
@@ -98,13 +106,7 @@ const Orders = ({navigation}) => {
           </TouchableOpacity>
         )
       }
-      return (
-        <View style={[styles.OrderStatusButton,{backgroundColor:'yellow'}]} >
-          <Text style={[styles.OrderStatusButtonText,{color:'#000'}]}>
-            Processing
-          </Text>
-        </View>
-      )
+
 
     }
     return (
