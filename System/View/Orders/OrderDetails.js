@@ -202,6 +202,8 @@ const OrderDetails = ({route,navigation}) => {
             getOrderDetails()
           })
         },'Mark Delivered','','truck-check')
+      }else  if (orderDetails.status === 8){
+        return MyOutlineButton(() => {console.log('Delivered')},'Canceled',{borderWidth:1,borderColor:mainColor},)
       }else{
         return MyOutlineButton(() => {console.log('Delivered')},'Processing',{borderWidth:1,borderColor:mainColor},)
       }
@@ -376,6 +378,13 @@ const OrderDetails = ({route,navigation}) => {
             <Text style={Style.LabelTitle}>Delivery charges</Text>
             <Text style={Style.LabelPrice}>₹ {orderDetails.delivery_changes}</Text>
           </View>
+          {(orderDetails.delivery_changes_discount > 0)?
+            <View style={{flexDirection:'row',paddingRight:'2%'}}>
+              <Text style={Style.LabelTitle}>Delivery free</Text>
+              <Text style={Style.LabelPrice}>₹ -{orderDetails.delivery_changes_discount}</Text>
+            </View>
+            :null
+          }
           {(orderDetails.mem_total_discount > 0)?
             <View style={{flexDirection:'row',paddingRight:'2%'}}>
               <Text style={Style.LabelTitle}>Membership discount</Text>

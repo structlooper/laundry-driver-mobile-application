@@ -251,6 +251,7 @@ const AddProducts = ({navigation}) => {
   if (loader){
     return Loader();
   }else if (services.length > 0){
+    console.log(order)
     return (
       <ScrollView style={{ height:'100%',backgroundColor:'#fff' }}>
         {openSelectService()}
@@ -301,6 +302,13 @@ const AddProducts = ({navigation}) => {
             <Text style={Styles.LabelTitle}>Delivery charges</Text>
             <Text style={Styles.LabelPrice}>₹ {order.delivery_changes}</Text>
           </View>
+          {(order.delivery_changes_discount > 0)?
+            <View style={{flexDirection:'row',paddingRight:'2%'}}>
+              <Text style={Styles.LabelTitle}>Delivery free</Text>
+              <Text style={Styles.LabelPrice}>₹ -{order.delivery_changes_discount}</Text>
+            </View>
+            :null
+          }
           {(order.mem_total_discount > 0)?
             <View style={{flexDirection:'row',paddingRight:'2%'}}>
               <Text style={Styles.LabelTitle}>Membership discount</Text>
