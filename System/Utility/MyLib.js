@@ -9,7 +9,7 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 
 export const mainColor = '#5414b3';
 export const AppName = 'KRYCHE';
-export const Url = 'http://covidvaccination.co.in/';
+export const Url = 'https://kryche.com/';
 //local//server//
 // export const Url ='http://192.168.43.39:8000/'
 export const ImageUrl = Url+'uploads/';
