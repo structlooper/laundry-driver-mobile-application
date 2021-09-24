@@ -231,7 +231,7 @@ const OrderDetails = ({route,navigation}) => {
                 }}
                 style={{ flex:1 }}
                 >
-                  <Text style={{ color:mainColor }}> ({data.item_count ?? 'add item count'})</Text>
+                  <Text style={{ color:mainColor }}> ({data.item_count ?? 'add count'})</Text>
                 </TouchableOpacity>
               </View>
 
@@ -337,7 +337,7 @@ const OrderDetails = ({route,navigation}) => {
       })
     }
     return (
-      <View style={{paddingVertical: 20,paddingHorizontal:20 , minHeight:hp('70')}}>
+      <View style={{flex:1,paddingVertical: 20,paddingHorizontal:20 , minHeight:hp('70')}}>
         {addItemCountModal()}
         <View style={{  }}>
           {(orderDetails.status === 3)?MyButton(()=>{navigation.navigate('OrderDetailsAddProducts')},'Add cloths',{marginHorizontal:20},'plus'):null}
@@ -365,7 +365,7 @@ const OrderDetails = ({route,navigation}) => {
             :null:null}
           {productRenderList()}
         </View>
-        <View style={{  paddingHorizontal:'5%',borderTopWidth:1,position:'absolute',left:0,right:0,bottom:0 }}>
+        <View style={{  flex:1 ,borderTopWidth:1,}}>
           <View style={{flexDirection:'row',marginTop:20,paddingRight:'2%'}}>
             <Text style={Style.LabelTitle}>Subtotal</Text>
             <Text style={Style.LabelPrice}>₹ {orderDetails.sub_total}</Text>
