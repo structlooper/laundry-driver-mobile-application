@@ -29,7 +29,6 @@ const CompletedOrders = ({navigation}) => {
       setOrders(response)
     })
   }
-
   const OrderCardCompleted = (order,i) => {
     return (
       <TouchableOpacity onPress={()=>{navigation.navigate('HomeScreenStack',{screen:'OrderDetails',params:{orderId:order.id}})}} key={i}>

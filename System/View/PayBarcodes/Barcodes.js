@@ -17,6 +17,7 @@ const Barcodes = () => {
       setBarcodes(response)
     })
   }
+
   const barCodeCard = (barcode,i) => {
     return (
       <View style={{ justifyContent:'center',alignItems:'center',borderWidth:1,borderRadius:20/2,margin:'2%' }} key={i}>
@@ -35,7 +36,7 @@ const Barcodes = () => {
   }
   if (!barcodes){
     return Loader()
-  }else if(barcodes.length === 0){
+  }else if(barcodes[0] === null){
     return NoData('Barcodes');
   }
   return (
@@ -47,6 +48,7 @@ const Barcodes = () => {
       </ScrollView>
     </View>
   );
+
 };
 
 export default Barcodes;

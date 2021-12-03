@@ -219,8 +219,8 @@ const OrderDetails = ({route,navigation}) => {
               </Text>
             </View>
             <View style={{flex:.8,}}>
-              <View style={{ flexDirection:"row" }}>
-                <Text style={{ fontSize:wp('4'),color: 'black'}}>
+              <View style={{ flexDirection:"row",alignItems:'center' }}>
+                <Text style={{ fontSize:wp('3'),color: 'black'}}>
                   {data.product_name}  ({data.service_name})
                 </Text>
                 <TouchableOpacity
@@ -231,7 +231,7 @@ const OrderDetails = ({route,navigation}) => {
                 }}
                 style={{ flex:1 }}
                 >
-                  <Text style={{ color:mainColor }}> ({data.item_count ?? 'add count'})</Text>
+                  <Text style={{ color:mainColor,fontSize:wp(2) }}> ({data.item_count ?? 'add count'})</Text>
                 </TouchableOpacity>
               </View>
 

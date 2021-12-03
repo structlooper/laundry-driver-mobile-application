@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:997084385614:android:0f52b271a5f5764871ce1f",
         "android_client_info": {
-          "package_name": "com.laundrydelivery"
+          "package_name": "com.krychedelivery"
         }
       },
       "oauth_client": [
@@ -38,7 +38,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:997084385614:android:17035c136764894b71ce1f",
         "android_client_info": {
-          "package_name": "com.laundryuser"
+          "package_name": "com.krychedelivery"
         }
       },
       "oauth_client": [

@@ -284,12 +284,12 @@ const AddProducts = ({navigation}) => {
           </View>
           {renderBottomList()}
         </View>
-        <View  style={{ height:hp('63') }}>
-          <ScrollView>
+        <View  style={{ height:hp('50'),overflow:'hidden' }}>
+          <ScrollView >
             {(categoryTab.length > 0)?renderProductList():NoDataFound()}
           </ScrollView>
         </View>
-        <View style={{  paddingHorizontal:'5%',borderTopWidth:1,position:'absolute',left:0,right:0,bottom:0 }}>
+        <View style={{  paddingHorizontal:'5%',borderTopWidth:1}}>
           <View style={{flexDirection:'row',paddingRight:'2%'}}>
             <Text style={Styles.LabelTitle}>Subtotal</Text>
             <Text style={Styles.LabelPrice}>₹ {order.sub_total}</Text>
